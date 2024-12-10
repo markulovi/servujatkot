@@ -1,0 +1,79 @@
+services:
+  cs2:
+    image: joedwards32/cs2
+    container_name: cs2
+    environment:
+      - STEAMAPPVALIDATE=0
+      - CS2_CHEATS=0
+      - CS2_SERVERNAME=Servujatkot CS2 server
+      - CS2_PORT=27015
+      - CS2_LAN=0
+      - CS2_PW=servujatkot
+      - CS2_RCONPW=servujatkot
+      - CS2_MAXPLAYERS=12
+      - CS2_SERVER_HIBERNATE=1
+      #- CS2_CFG_URL=https://github.com/joedwards32/CS2/raw/refs/heads/main/examples/cs2.cfg.tgz
+      - TV_AUTORECORD=1
+      - TV_ENABLE=1
+      - TV_PORT=27020
+      - TV_PW=servujatkot
+      - TV_RELAYPW=servujatkot
+    ports:
+      - 27015:27015/tcp
+      - 27015:27015/udp
+      - 27020:27020/udp
+    volumes:
+      - ./cs2/steam:/home/steam/cs2-dedicated
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+  propilkki2:
+    build:
+      context: ./propilkki2
+    container_name: propilkki2
+    restart: unless-stopped
+    ports:
+      - "4500:4500"
+  teamspeak3_db:
+    image: mariadb
+    container_name: teamspeak3_db
+    restart: unless-stopped
+    volumes:
+      - "./teamspeak3/db:/var/lib/mysql"
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD: 1
+    env_file: .env
+  teamspeak3:
+    image: carlgo11/teamspeak
+    container_name: teamspeak3
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "9987:9987/udp"
+      - "10011:10011"
+      - "30033:30033"
+    volumes:
+      - "./teamspeak3/ts3server_config.ini:/teamspeak/ts3server.ini:ro"
+      - "./teamspeak3/init_channels.sh:/teamspeak/init_channels.sh:ro"
+      - "./teamspeak3/allowlist.txt:/teamspeak/allowlist.txt:ro"
+      - "./teamspeak3/files:/teamspeak/files"
+      - "./teamspeak3/logs:/teamspeak/logs"
+    tmpfs: "/teamspeak:exec,uid=1000,mode=700"
+  mumble:
+    image: "mumblevoip/mumble-server:latest"
+    container_name: mumble
+    ports:
+      - "64738:64738/tcp"
+      - "64738:64738/udp"
+    volumes:
+      - mumble:/data
+    environment:
+      - MUMBLE_SERVER_PASSWORD=servujatkot
+      - MUMBLE_SUPERUSER_PASSWORD=servujatkot
+      - MUMBLE_BANDWIDTH=72000
+      - MUMBLE_REGISTER=false
+      - MUMBLE_CONFIG_WELCOMETEXT=Servujatkot Mumble Server
+    restart: unless-stopped
+
+volumes:
+  mumble:
