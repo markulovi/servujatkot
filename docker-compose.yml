@@ -5,19 +5,19 @@ services:
     environment:
       - STEAMAPPVALIDATE=0
       - CS2_CHEATS=0
-      - CS2_SERVERNAME=Servujatkot CS2 server
+      - CS2_SERVERNAME=$ORGA CS2 server
       - CS2_PORT=27015
       - CS2_LAN=0
-      - CS2_PW=servujatkot
-      - CS2_RCONPW=servujatkot
+      - CS2_PW=$ORGA
+      - CS2_RCONPW=$ORGA
       - CS2_MAXPLAYERS=12
       - CS2_SERVER_HIBERNATE=1
       #- CS2_CFG_URL=https://github.com/joedwards32/CS2/raw/refs/heads/main/examples/cs2.cfg.tgz
       - TV_AUTORECORD=1
       - TV_ENABLE=1
       - TV_PORT=27020
-      - TV_PW=servujatkot
-      - TV_RELAYPW=servujatkot
+      - TV_PW=$ORGA
+      - TV_RELAYPW=$ORGA
     ports:
       - 27015:27015/tcp
       - 27015:27015/udp
@@ -68,11 +68,11 @@ services:
     volumes:
       - mumble:/data
     environment:
-      - MUMBLE_SERVER_PASSWORD=servujatkot
-      - MUMBLE_SUPERUSER_PASSWORD=servujatkot
+      - MUMBLE_SERVER_PASSWORD=$ORGA
+      - MUMBLE_SUPERUSER_PASSWORD=$ORGA
       - MUMBLE_BANDWIDTH=72000
       - MUMBLE_REGISTER=false
-      - MUMBLE_CONFIG_WELCOMETEXT=Servujatkot Mumble Server
+      - MUMBLE_CONFIG_WELCOMETEXT=$ORGA Mumble Server
     restart: unless-stopped
 
 volumes:
