@@ -15,7 +15,7 @@ Latest cssharp download url can be found from https://github.com/roflmuffin/Coun
 Latest matchzy download url can be found from https://github.com/shobhit-pathak/MatchZy/releases/ (the one without cssharp)
 
 ```
-source .env
+export $(grep -v '^#' .env | xargs)
 ```
 
 ```
