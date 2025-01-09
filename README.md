@@ -10,7 +10,7 @@ Fill in the values.
 
 Latest metamod download url can be found from https://www.metamodsource.net/downloads.php?branch=dev
 
-Latest cssharp download url can be found from https://github.com/roflmuffin/CounterStrikeSharp/releases (the one the runtime)
+Latest cssharp download url can be found from https://github.com/roflmuffin/CounterStrikeSharp/releases (the one with runtime)
 
 Latest matchzy download url can be found from https://github.com/shobhit-pathak/MatchZy/releases/ (the one without cssharp)
 
@@ -23,6 +23,7 @@ mkdir -p cs2/steam
 ```
 
 ```
+docker network create -d bridge get5
 docker compose up -d
 ```
 
