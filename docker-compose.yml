@@ -67,7 +67,12 @@ services:
     image: carlgo11/teamspeak
     container_name: teamspeak3
     restart: unless-stopped
-    env_file: .env
+    environment:
+      MARIADB_HOST: $TS_MARIADB_HOST
+      MARIADB_PORT: $TS_MARIADB_PORT
+      MARIADB_USER: $TS_MARIADB_USER
+      MARIADB_PASSWORD: $TS_MARIADB_PASSWORD
+      MARIADB_DATABASE: $TS_MARIADB_DATABASE
     ports:
       - "9987:9987/udp"
       - "10011:10011"
