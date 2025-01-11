@@ -61,6 +61,9 @@ services:
       - "./teamspeak3/db:/var/lib/mysql"
     environment:
       MARIADB_RANDOM_ROOT_PASSWORD: 1
+      MARIADB_USER: $TS_MARIADB_USER
+      MARIADB_PASSWORD: $TS_MARIADB_PASSWORD
+      MARIADB_DATABASE: $TS_MARIADB_DATABASE
     env_file: .env
 
   teamspeak3:
