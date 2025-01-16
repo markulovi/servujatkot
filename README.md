@@ -42,6 +42,10 @@ docker compose restart cs2-server
 
 docker run -it --rm outdead/rcon ./rcon -a cs2.poggers.fi:27015 -p servujatkot "<komento>"
 
+## TeamSpeak
+
+Check teamspeak container logs for ServerAdmin privilege key
+
 ## Pro Pilkki 2
 
 http://propilkki.net/index.php/pro-pilkki-2/verkkopelien-komennot
