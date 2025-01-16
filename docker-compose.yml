@@ -53,40 +53,39 @@ services:
     ports:
       - "4500:4500"
 
-  teamspeak3_db:
-    image: mariadb
-    container_name: teamspeak3_db
-    restart: unless-stopped
-    volumes:
-      - "./teamspeak3/db:/var/lib/mysql"
-    environment:
-      MARIADB_RANDOM_ROOT_PASSWORD: 1
-      MARIADB_USER: $TS_MARIADB_USER
-      MARIADB_PASSWORD: $TS_MARIADB_PASSWORD
-      MARIADB_DATABASE: $TS_MARIADB_DATABASE
-    env_file: .env
+  # teamspeak3_db:
+  #   image: mariadb
+  #   container_name: teamspeak3_db
+  #   restart: unless-stopped
+  #   volumes:
+  #     - "./teamspeak3/db:/var/lib/mysql"
+  #   environment:
+  #     MARIADB_RANDOM_ROOT_PASSWORD: 1
+  #     MARIADB_USER: $TS_MARIADB_USER
+  #     MARIADB_PASSWORD: $TS_MARIADB_PASSWORD
+  #     MARIADB_DATABASE: $TS_MARIADB_DATABASE
+  #   env_file: .env
 
-  teamspeak3:
-    image: carlgo11/teamspeak
-    container_name: teamspeak3
-    restart: unless-stopped
-    environment:
-      MARIADB_HOST: $TS_MARIADB_HOST
-      MARIADB_PORT: $TS_MARIADB_PORT
-      MARIADB_USER: $TS_MARIADB_USER
-      MARIADB_PASSWORD: $TS_MARIADB_PASSWORD
-      MARIADB_DATABASE: $TS_MARIADB_DATABASE
-    ports:
-      - "9987:9987/udp"
-      - "10011:10011"
-      - "30033:30033"
-    volumes:
-      - "./teamspeak3/ts3server_config.ini:/teamspeak/ts3server.ini:ro"
-      - "./teamspeak3/init_channels.sh:/teamspeak/init_channels.sh:ro"
-      - "./teamspeak3/allowlist.txt:/teamspeak/allowlist.txt:ro"
-      - "./teamspeak3/files:/teamspeak/files"
-      - "./teamspeak3/logs:/teamspeak/logs"
-    tmpfs: "/teamspeak:exec,uid=1000,mode=700"
+  # teamspeak3:
+  #   image: carlgo11/teamspeak
+  #   container_name: teamspeak3
+  #   restart: unless-stopped
+  #   environment:
+  #     MARIADB_HOST: $TS_MARIADB_HOST
+  #     MARIADB_PORT: $TS_MARIADB_PORT
+  #     MARIADB_USER: $TS_MARIADB_USER
+  #     MARIADB_PASSWORD: $TS_MARIADB_PASSWORD
+  #     MARIADB_DATABASE: $TS_MARIADB_DATABASE
+  #   ports:
+  #     - "9987:9987/udp"
+  #     - "10011:10011"
+  #     - "30033:30033"
+  #   volumes:
+  #     - "./teamspeak3/ts3server_config.ini:/teamspeak/ts3server.ini:ro"
+  #     - "./teamspeak3/init_channels.sh:/teamspeak/init_channels.sh:ro"
+  #     - "./teamspeak3/allowlist.txt:/teamspeak/allowlist.txt:ro"
+  #     - "./teamspeak3/files:/teamspeak/files"
+  #     - "./teamspeak3/logs:/teamspeak/logs"
 
   mumble:
     image: "mumblevoip/mumble-server:latest"
@@ -95,7 +94,7 @@ services:
       - "64738:64738/tcp"
       - "64738:64738/udp"
     volumes:
-      - mumble:/data
+      - ./mumble:/data
     environment:
       - MUMBLE_SERVER_PASSWORD=$ORGA
       - MUMBLE_SUPERUSER_PASSWORD=$ORGA
@@ -197,6 +196,3 @@ services:
 networks:
   get5:
     external: true
-
-volumes:
-  mumble:
