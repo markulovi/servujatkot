@@ -1,0 +1,42 @@
+; J9774A Configuration Editor; Created on release #YA.16.08.0002
+; Ver #14:01.44.00.04.19.02.13.98.82.34.61.18.28.f3.84.9c.63.ff.37.27:45
+hostname "HP-2530-8G-PoEP"
+ip default-gateway 192.168.1.1
+interface 1
+   no power-over-ethernet
+   exit
+interface 2
+   no power-over-ethernet
+   exit
+interface 3
+   no power-over-ethernet
+   exit
+interface 4
+   no power-over-ethernet
+   exit
+interface 5
+   no power-over-ethernet
+   exit
+interface 6
+   no power-over-ethernet
+   exit
+interface 7
+   no power-over-ethernet
+   exit
+interface 8
+   no power-over-ethernet
+   exit
+snmp-server community "public" unrestricted
+vlan 1
+   name "DEFAULT_VLAN"
+   no untagged 1-8
+   untagged 9-10
+   ip address dhcp-bootp
+   exit
+vlan 2
+   name "koneet"
+   untagged 1-8
+   tagged 10
+   no ip address
+   exit
+
