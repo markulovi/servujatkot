@@ -19,6 +19,11 @@ export $(grep -v '^#' .env | xargs)
 ```
 
 ```
+export UID=$(id -u)
+export GID=$(id -g)
+```
+
+```
 mkdir -p cs2/steam
 mkdir mumble
 ```
