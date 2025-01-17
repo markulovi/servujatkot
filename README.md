@@ -33,6 +33,12 @@ docker network create -d bridge caddy
 docker compose up -d
 ```
 
+**NOTE**: Downloading and installing CS2 server takes a lot of time. Check the logs to see if the installation is finished before proceeding.
+
+```
+docker container logs cs2-server
+```
+
 ## CS2 setup
 
 ```
