@@ -6,7 +6,7 @@
 cp .env.example .env
 ```
 
-Fill in the values.
+Fill in the values. **THIS IS IMPORTANT**.
 
 Latest metamod download url can be found from https://www.metamodsource.net/downloads.php?branch=dev
 
