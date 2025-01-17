@@ -1,5 +1,13 @@
 # Laniservut
 
+## Prerequisites
+
+- Docker (with compose)
+- unzip
+- tar
+- curl
+- sed
+
 ## Installation
 
 ```
