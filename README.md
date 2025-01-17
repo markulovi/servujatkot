@@ -19,29 +19,50 @@ export $(grep -v '^#' .env | xargs)
 ```
 
 ```
-mkdir -p cs2/steam
+export UID=$(id -u)
+export GID=$(id -g)
 ```
 
 ```
-docker network create -d bridge get5
+mkdir -p cs2/steam
+mkdir mumble
+```
+
+```
+docker network create -d bridge caddy
 docker compose up -d
 ```
 
-## CS2 installation
-
-Install metamod, cssharp and matchzy
+## CS2 setup
 
 ```
-cd cs2
-./setup.sh
-cd ..
-docker compose restart cs2-server
+cp admins.example.json cs2/admins.json
+```
+
+Fill in the admins.json file with steam ids.
+
+Run the setup script
+
+```
+./cs2.sh
 ```
 
 ## CS2 rcon
 
 docker run -it --rm outdead/rcon ./rcon -a cs2.poggers.fi:27015 -p servujatkot "<komento>"
 
+## TeamSpeak
+
+Check teamspeak container logs for ServerAdmin privilege key
+
 ## Pro Pilkki 2
 
 http://propilkki.net/index.php/pro-pilkki-2/verkkopelien-komennot
+
+## Admin panels
+
+Pilkki admin should be accessible at `https://pilkki.<your hostname>`
+
+Get5 admin should be accessible at `https://g5.<your hostname>`
+
+**NOTE**: DNS needs to be configured for the admin panels to work.

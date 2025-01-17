@@ -50,49 +50,53 @@ services:
       context: ./propilkki2
     container_name: propilkki2
     restart: unless-stopped
+    networks:
+      - caddy
     ports:
       - "4500:4500"
+    labels:
+      caddy: pilkki.$SERVER_HOSTNAME
+      caddy.reverse_proxy: "{{upstreams 4500}}"
 
-  teamspeak3_db:
-    image: mariadb
-    container_name: teamspeak3_db
+  teamspeak:
+    image: teamspeak
+    container_name: teamspeak
     restart: unless-stopped
-    volumes:
-      - "./teamspeak3/db:/var/lib/mysql"
-    environment:
-      MARIADB_RANDOM_ROOT_PASSWORD: 1
-    env_file: .env
-
-  teamspeak3:
-    image: carlgo11/teamspeak
-    container_name: teamspeak3
-    restart: unless-stopped
-    environment:
-      MARIADB_HOST: $TS_MARIADB_HOST
-      MARIADB_PORT: $TS_MARIADB_PORT
-      MARIADB_USER: $TS_MARIADB_USER
-      MARIADB_PASSWORD: $TS_MARIADB_PASSWORD
-      MARIADB_DATABASE: $TS_MARIADB_DATABASE
     ports:
-      - "9987:9987/udp"
-      - "10011:10011"
-      - "30033:30033"
+      - 9987:9987/udp
+      - 10011:10011
+      - 30033:30033
+    environment:
+      TS3SERVER_DB_PLUGIN: ts3db_mariadb
+      TS3SERVER_DB_SQLCREATEPATH: create_mariadb
+      TS3SERVER_DB_HOST: $TS_MARIADB_HOST
+      TS3SERVER_DB_USER: $TS_MARIADB_USER
+      TS3SERVER_DB_PASSWORD: $TS_MARIADB_PASSWORD
+      TS3SERVER_DB_NAME: $TS_MARIADB_DATABASE
+      TS3SERVER_DB_WAITUNTILREADY: 30
+      TS3SERVER_LICENSE: accept
+
+  teamspeakdb:
+    image: mariadb
+    container_name: teamspeakdb
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: $TS_MARIADB_PASSWORD
+      MYSQL_DATABASE: $TS_MARIADB_DATABASE
+      MYSQL_USER: $TS_MARIADB_USER
+      MYSQL_PASSWORD: $TS_MARIADB_PASSWORD
     volumes:
-      - "./teamspeak3/ts3server_config.ini:/teamspeak/ts3server.ini:ro"
-      - "./teamspeak3/init_channels.sh:/teamspeak/init_channels.sh:ro"
-      - "./teamspeak3/allowlist.txt:/teamspeak/allowlist.txt:ro"
-      - "./teamspeak3/files:/teamspeak/files"
-      - "./teamspeak3/logs:/teamspeak/logs"
-    tmpfs: "/teamspeak:exec,uid=1000,mode=700"
+      - teamspeakdb:/var/lib/mysql
 
   mumble:
     image: "mumblevoip/mumble-server:latest"
     container_name: mumble
+    user: ${UID}:${GID}
     ports:
       - "64738:64738/tcp"
       - "64738:64738/udp"
     volumes:
-      - mumble:/data
+      - ./mumble:/data
     environment:
       - MUMBLE_SERVER_PASSWORD=$ORGA
       - MUMBLE_SUPERUSER_PASSWORD=$ORGA
@@ -108,7 +112,7 @@ services:
     command: redis-server --requirepass $GET5_REDIS_PASSWORD
     container_name: redis
     networks:
-      - get5
+      - caddy
     restart: always
 
   get5db:
@@ -116,7 +120,7 @@ services:
     container_name: get5db
     restart: always
     networks:
-      - get5
+      - caddy
     environment:
       - MYSQL_ROOT_PASSWORD=$GET5_MARIADB_PASSWORD
       - MYSQL_DATABASE=$GET5_MARIADB_DATABASE
@@ -127,21 +131,21 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - ./get5db/mysql:/var/lib/mysql
+      - get5db:/var/lib/mysql
 
   caddy:
     image: lucaslorentz/caddy-docker-proxy:ci-alpine
     container_name: caddy-reverse-proxy
     restart: unless-stopped
     networks:
-      - get5
+      - caddy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 80:80
       - 443:443
     environment:
-      - CADDY_INGRESS_NETWORKS=get5
+      - CADDY_INGRESS_NETWORKS=caddy
 
   g5api:
     image: ghcr.io/phlexplexico/g5api:latest
@@ -149,22 +153,22 @@ services:
       - get5db
     container_name: G5API
     networks:
-      - get5
+      - caddy
     labels:
-      caddy: $SERVER_HOSTNAME
+      caddy: g5.$SERVER_HOSTNAME
       caddy.handle_path: /api/*
       caddy.handle_path.0_reverse_proxy: "{{upstreams 3301}}"
     volumes:
-      - ./public:/Get5API/public
+      - get5public:/Get5API/public
     environment:
       - NODE_ENV=production
       - PORT=3301
       - DBKEY=$GET5_DB_KEY
       - STEAMAPIKEY=$GET5_STEAM_API_KEY
-      - HOSTNAME=https://$SERVER_HOSTNAME
+      - HOSTNAME=https://g5.$SERVER_HOSTNAME
       - SHAREDSECRET=$GET5_SECRET
-      - CLIENTHOME=https://$SERVER_HOSTNAME
-      - APIURL=https://$SERVER_HOSTNAME/api
+      - CLIENTHOME=https://g5.$SERVER_HOSTNAME
+      - APIURL=https://g5.$SERVER_HOSTNAME/api
       - SQLUSER=$GET5_MARIADB_USER
       - SQLPASSWORD=$GET5_MARIADB_PASSWORD
       - SQLPORT=3306
@@ -185,15 +189,17 @@ services:
       - g5api
     container_name: G5V-frontend
     networks:
-      - get5
+      - caddy
     restart: always
     labels:
-      caddy: $SERVER_HOSTNAME
+      caddy: g5.$SERVER_HOSTNAME
       caddy.reverse_proxy: "{{upstreams}}"
 
 networks:
-  get5:
+  caddy:
     external: true
 
 volumes:
-  mumble:
+  get5db:
+  teamspeakdb:
+  get5public:
