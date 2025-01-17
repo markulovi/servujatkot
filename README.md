@@ -33,15 +33,18 @@ docker network create -d bridge caddy
 docker compose up -d
 ```
 
-## CS2 installation
-
-Install metamod, cssharp and matchzy
+## CS2 setup
 
 ```
-cd cs2
-./setup.sh
-cd ..
-docker compose restart cs2-server
+cp admins.example.json cs2/admins.json
+```
+
+Fill in the admins.json file with steam ids.
+
+Run the setup script
+
+```
+./cs2.sh
 ```
 
 ## CS2 rcon

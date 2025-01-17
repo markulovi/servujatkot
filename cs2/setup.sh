@@ -40,3 +40,7 @@ if ! grep -q "csgo/addons/metamod" "$GAME_INFO"; then
 else
   echo "Metamod plugin is already activated."
 fi
+
+echo "Copying MatchZy admins..."
+cp admins.json $GAME_PATH/csgo/cfg/MatchZy/admins.json
+echo "MatchZy admins copied successfully."
