@@ -71,4 +71,4 @@ Pilkki admin should be accessible at `https://pilkki.<your hostname>`
 
 Get5 admin should be accessible at `https://g5.<your hostname>`
 
-**NOTE**: DNS needs to be configured for the admin panels to work.
+**NOTE**: DNS needs to be configured for these urls to work. Point your hostname to the host ip. You can also use the ip to access admin panels.
