@@ -6,7 +6,7 @@
 cp .env.example .env
 ```
 
-Fill in the values.
+Fill in the values. **THIS IS IMPORTANT**.
 
 Latest metamod download url can be found from https://www.metamodsource.net/downloads.php?branch=dev
 
@@ -31,6 +31,12 @@ mkdir mumble
 ```
 docker network create -d bridge caddy
 docker compose up -d
+```
+
+**NOTE**: Downloading and installing CS2 server takes a lot of time. Check the logs to see if the installation is finished before proceeding.
+
+```
+docker container logs cs2-server
 ```
 
 ## CS2 setup
@@ -65,4 +71,4 @@ Pilkki admin should be accessible at `https://pilkki.<your hostname>`
 
 Get5 admin should be accessible at `https://g5.<your hostname>`
 
-**NOTE**: DNS needs to be configured for the admin panels to work.
+**NOTE**: DNS needs to be configured for these urls to work. Point your hostname to the host ip. You can also use the ip to access admin panels.
