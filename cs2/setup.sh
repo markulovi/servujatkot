@@ -41,6 +41,10 @@ else
   echo "Metamod plugin is already activated."
 fi
 
+cd ..
+cd ..
+cd ..
+
 echo "Copying MatchZy admins..."
-cp admins.json $GAME_PATH/csgo/cfg/MatchZy/admins.json
+cp admins.json $GAME_PATH/cfg/MatchZy/admins.json
 echo "MatchZy admins copied successfully."
