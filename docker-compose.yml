@@ -50,8 +50,13 @@ services:
       context: ./propilkki2
     container_name: propilkki2
     restart: unless-stopped
+    networks:
+      - caddy
     ports:
       - "4500:4500"
+    labels:
+      caddy: pilkki.$SERVER_HOSTNAME
+      caddy.reverse_proxy: "{{upstreams 4500}}"
 
   teamspeak:
     image: teamspeak
@@ -108,7 +113,7 @@ services:
     command: redis-server --requirepass $GET5_REDIS_PASSWORD
     container_name: redis
     networks:
-      - get5
+      - caddy
     restart: always
 
   get5db:
@@ -116,7 +121,7 @@ services:
     container_name: get5db
     restart: always
     networks:
-      - get5
+      - caddy
     environment:
       - MYSQL_ROOT_PASSWORD=$GET5_MARIADB_PASSWORD
       - MYSQL_DATABASE=$GET5_MARIADB_DATABASE
@@ -135,14 +140,14 @@ services:
     container_name: caddy-reverse-proxy
     restart: unless-stopped
     networks:
-      - get5
+      - caddy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 80:80
       - 443:443
     environment:
-      - CADDY_INGRESS_NETWORKS=get5
+      - CADDY_INGRESS_NETWORKS=caddy
 
   g5api:
     image: ghcr.io/phlexplexico/g5api:latest
@@ -150,9 +155,9 @@ services:
       - get5db
     container_name: G5API
     networks:
-      - get5
+      - caddy
     labels:
-      caddy: $SERVER_HOSTNAME
+      caddy: g5.$SERVER_HOSTNAME
       caddy.handle_path: /api/*
       caddy.handle_path.0_reverse_proxy: "{{upstreams 3301}}"
     volumes:
@@ -162,10 +167,10 @@ services:
       - PORT=3301
       - DBKEY=$GET5_DB_KEY
       - STEAMAPIKEY=$GET5_STEAM_API_KEY
-      - HOSTNAME=https://$SERVER_HOSTNAME
+      - HOSTNAME=https://g5.$SERVER_HOSTNAME
       - SHAREDSECRET=$GET5_SECRET
-      - CLIENTHOME=https://$SERVER_HOSTNAME
-      - APIURL=https://$SERVER_HOSTNAME/api
+      - CLIENTHOME=https://g5.$SERVER_HOSTNAME
+      - APIURL=https://g5.$SERVER_HOSTNAME/api
       - SQLUSER=$GET5_MARIADB_USER
       - SQLPASSWORD=$GET5_MARIADB_PASSWORD
       - SQLPORT=3306
@@ -186,14 +191,14 @@ services:
       - g5api
     container_name: G5V-frontend
     networks:
-      - get5
+      - caddy
     restart: always
     labels:
-      caddy: $SERVER_HOSTNAME
+      caddy: g5.$SERVER_HOSTNAME
       caddy.reverse_proxy: "{{upstreams}}"
 
 networks:
-  get5:
+  caddy:
     external: true
 
 volumes:

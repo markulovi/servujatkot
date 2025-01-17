@@ -24,7 +24,7 @@ mkdir mumble
 ```
 
 ```
-docker network create -d bridge get5
+docker network create -d bridge caddy
 docker compose up -d
 ```
 
