@@ -20,6 +20,7 @@ export $(grep -v '^#' .env | xargs)
 
 ```
 mkdir -p cs2/steam
+mkdir mumble
 ```
 
 ```
