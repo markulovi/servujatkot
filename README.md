@@ -58,3 +58,11 @@ Check teamspeak container logs for ServerAdmin privilege key
 ## Pro Pilkki 2
 
 http://propilkki.net/index.php/pro-pilkki-2/verkkopelien-komennot
+
+## Admin panels
+
+Pilkki admin should be accessible at `https://pilkki.<your hostname>`
+
+Get5 admin should be accessible at `https://g5.<your hostname>`
+
+**NOTE**: DNS needs to be configured for the admin panels to work.
