@@ -2,6 +2,6 @@ services:
   cs2-plugin-install:
     build: .
     container_name: cs2-plugin-install
-    env_file: ./env/common.env
+    env_file: .env
     volumes:
       - ./cs2:/home/ubuntu/cs2

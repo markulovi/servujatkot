@@ -1,8 +1,5 @@
 #!/bin/bash
 
-export $(grep -v '^#' ./env/common.env | xargs)
-export $(grep -v '^#' ./env/cs2.env | xargs)
-
 GAME_PATH="./cs2/steam/game/csgo"
 GAME_INFO="gameinfo.gi"
 
@@ -59,3 +56,6 @@ truncate -s-2 $ADMINS_PATH
 echo "}" >> $ADMINS_PATH
 
 echo "MatchZy admins copied successfully."
+
+echo "Fixing permissions..."
+chown -R 1000:1000 ./cs2
