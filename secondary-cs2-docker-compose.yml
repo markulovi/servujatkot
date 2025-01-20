@@ -1,0 +1,16 @@
+services:
+  cs2-secondary:
+    image: joedwards32/cs2
+    container_name: cs2-secondary
+    restart: unless-stopped
+    env_file:
+      - ./env/common.env
+      - ./env/cs2.env
+    volumes:
+      - ./cs2-secondary/steam:/home/steam/cs2-dedicated
+    ports:
+      - 27015:27016/tcp
+      - 27015:27016/udp
+      - 27020:27021/udp
+    stdin_open: true
+    tty: true
