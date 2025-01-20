@@ -16,7 +16,7 @@ If running on Windows, copy `env/example/common.env.example` to `.env` in projec
 
 Fill in Get5 admins and Steam API key in `.env`. Other configs are mostly interpolated with these variables, change them if needed.
 
-Optionally check if MetaMod or MatchZy have been updated and create a pull request for the new versions.
+Optionally check if MetaMod, CounterStrikeSharp or MatchZy have been updated and create a pull request for the new versions.
 
 Start CS2 server once to download files:
 

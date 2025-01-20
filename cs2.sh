@@ -14,6 +14,14 @@ echo "Removing Metamod tar file..."
 rm metamod.tar.gz
 echo "Metamod installed successfully."
 
+echo "Downloading CSSharp..."
+curl -L $CSSHARP_RELEASE_URL -o cssharp.zip
+echo "Unpacking CSSharp..."
+unzip cssharp.zip
+echo "Removing CSSharp zip file..."
+rm cssharp.zip
+echo "CSSharp installed successfully."
+
 echo "Downloading MatchZy..."
 curl -L $MATCHZY_RELEASE_URL -o matchzy.zip
 echo "Unpacking MatchZy..."
