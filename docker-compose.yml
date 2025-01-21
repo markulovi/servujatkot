@@ -55,7 +55,9 @@ services:
     image: "mumblevoip/mumble-server:latest"
     container_name: mumble
     restart: unless-stopped
-    env_file: .env
+    env_file:
+      - .env
+      - ./env/mumble.env
     ports:
       - 64738:64738
 

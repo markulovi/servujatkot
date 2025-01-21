@@ -2,17 +2,20 @@
 
 ## Prerequisites
 
+- x86 Unix environment (Linux, WSL or Mac)
 - Docker Compose
 
 ## Installation
+
+Try to make sure your user has uid=1000 and gid=1000.
+This is mostly required for CS2, as the container user has those IDs and needs read access to the bind mount.
+Check with `id`.
 
 Create `.env` files
 
 ```
 ./setup-env.sh
 ```
-
-If running on Windows, copy `env/example/common.env.example` to `.env` in project root and other files to `env/*` while also removing the `.example`.
 
 Fill in Get5 admins and Steam API key in `.env`. Other configs are mostly interpolated with these variables, change them if needed.
 
@@ -89,6 +92,13 @@ docker compose logs teamspeak
 TeamSpeak should ask for the privilege key when the first user connects, and that user will become the server admin.
 
 Configuration can then be done from the TeamSpeak client (e.g. right click server name -> Edit virtual server, Create channel etc.)
+
+
+## Mumble
+
+Login as SuperUser with password from `env/mumble.env`.
+
+Configuration can then be done from the Mumble client (e.g. right click -> Add)
 
 ## Pro Pilkki 2
 
