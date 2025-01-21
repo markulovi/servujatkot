@@ -94,6 +94,16 @@ Configuration can then be done from the TeamSpeak client (e.g. right click serve
 
 http://propilkki.net/index.php/pro-pilkki-2/verkkopelien-komennot
 
+Configuration is applied at Docker image build time.
+
+Edit `propilkki/pp2host.conf` and `propilkki/autohost.ini` and force rebuild
+
+```
+docker compose up -d --build propilkki2
+```
+
+By default only `$ORGA` and `$ADMIN` variables are passed to the build process.
+
 ## Admin panels
 
 Pilkki admin should be accessible at `https://pilkki.<your hostname>`
