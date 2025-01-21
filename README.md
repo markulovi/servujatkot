@@ -2,76 +2,117 @@
 
 ## Prerequisites
 
-- Docker (with compose)
-- unzip
-- tar
-- curl
-- sed
+- x86 Unix environment (Linux, WSL or Mac)
+- Docker Compose
 
 ## Installation
 
-```
-cp .env.example .env
-```
+Try to make sure your user has uid=1000 and gid=1000.
+This is mostly required for CS2, as the container user has those IDs and needs read access to the bind mount.
+Check with `id`.
 
-Fill in the values. **THIS IS IMPORTANT**.
-
-Latest metamod download url can be found from https://www.metamodsource.net/downloads.php?branch=dev
-
-Latest cssharp download url can be found from https://github.com/roflmuffin/CounterStrikeSharp/releases (the one with runtime)
-
-Latest matchzy download url can be found from https://github.com/shobhit-pathak/MatchZy/releases/ (the one without cssharp)
+Create `.env` files
 
 ```
-export $(grep -v '^#' .env | xargs)
+./setup-env.sh
 ```
 
-```
-export UID=$(id -u)
-export GID=$(id -g)
-```
+Fill in Get5 admins and Steam API key in `.env`. Other configs are mostly interpolated with these variables, change them if needed.
+
+Optionally check if MetaMod, CounterStrikeSharp or MatchZy have been updated and create a pull request for the new versions.
+
+Start CS2 server once to download files:
 
 ```
-mkdir -p cs2/steam
-mkdir mumble
+docker compose up -d cs2
 ```
 
+Monitor logs for CS2 installation progress
+
 ```
-docker network create -d bridge caddy
+docker compose logs -f cs2
+```
+
+When completed, stop server(s)
+
+```
+docker compose down
+```
+
+Run CS2 setup script
+
+```
+docker compose -f install-cs2-plugins-docker-compose.yml up
+```
+
+After successful execution, servers should be ready for use.
+
+## Usage
+
+```
 docker compose up -d
 ```
 
-**NOTE**: Downloading and installing CS2 server takes a lot of time. Check the logs to see if the installation is finished before proceeding.
+Usage is also possible with a convenience script `./up.sh`
+
+## Running another CS2 server
+
+Copy files from primary server
 
 ```
-docker container logs cs2-server
+./init-secondary-cs2.sh
 ```
 
-## CS2 setup
+Start secondary server
 
 ```
-cp admins.example.json cs2/admins.json
+./start-secondary-cs2.sh
 ```
 
-Fill in the admins.json file with steam ids.
+Server uses the same configs, but ports are 27016 for the game and 27021 for CSTV respectively.
 
-Run the setup script
+TODO: Investigate Caddy reverse proxy usage to set hostnames for CS2 servers
+
+## CS2 RCON
+
+Substitute hostname, RCON password and optionally port with correct values for environment
 
 ```
-./cs2.sh
+docker run -it --rm outdead/rcon ./rcon -a $SERVER_HOSTNAME:27015 -p $CS2_RCONPW "mp_friendlyfire 1"
 ```
-
-## CS2 rcon
-
-docker run -it --rm outdead/rcon ./rcon -a cs2.poggers.fi:27015 -p servujatkot "<komento>"
 
 ## TeamSpeak
 
 Check teamspeak container logs for ServerAdmin privilege key
 
+```
+docker compose logs teamspeak
+```
+
+TeamSpeak should ask for the privilege key when the first user connects, and that user will become the server admin.
+
+Configuration can then be done from the TeamSpeak client (e.g. right click server name -> Edit virtual server, Create channel etc.)
+
+
+## Mumble
+
+Login as SuperUser with password from `env/mumble.env`.
+
+Configuration can then be done from the Mumble client (e.g. right click -> Add)
+
 ## Pro Pilkki 2
 
 http://propilkki.net/index.php/pro-pilkki-2/verkkopelien-komennot
+
+Configuration is applied at Docker image build time.
+
+Edit `propilkki/pp2host.conf` and `propilkki/autohost.ini` and force rebuild
+
+```
+docker compose up -d --build propilkki2
+```
+
+By default only `$ORGA` and `$ADMIN` variables are passed to the build process.
 
 ## Admin panels
 
@@ -80,3 +121,37 @@ Pilkki admin should be accessible at `https://pilkki.<your hostname>`
 Get5 admin should be accessible at `https://g5.<your hostname>`
 
 **NOTE**: DNS needs to be configured for these urls to work. Point your hostname to the host ip. You can also use the ip to access admin panels.
+
+## Troubleshooting
+
+### CS2 error: Client is out of date
+
+Set `STEAMAPPVALIDATE=1` in `env/cs2.env`
+
+(Re)start CS2 server
+
+```
+docker compose restart cs2
+```
+
+Monitor logs for CS2 validation progress
+
+```
+docker compose logs -f cs2
+```
+
+When completed, stop server(s)
+
+```
+docker compose down cs2
+```
+
+Rerun CS2 setup script (`gameinfo.si` gets overwritten by validation)
+
+```
+./cs2.sh
+```
+
+Set `STEAMAPPVALIDATE=0` in `env/cs2.env`
+
+Run server normally ([Usage](#usage))

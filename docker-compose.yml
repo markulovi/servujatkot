@@ -1,59 +1,42 @@
 services:
-  cs2-server:
-    image: joedwards32/cs2
-    container_name: cs2-server
-    environment:
-      # Server configuration
-      - SRCDS_TOKEN=$SRCDS_TOKEN      # Game Server Token from https://steamcommunity.com/dev/managegameservers
-      - STEAMAPPVALIDATE=0            # (0 - no validation, 1 - enable validation)
-      - CS2_SERVERNAME=$ORGA          # (Set the visible name for your private server)
-      - CS2_CHEATS=0                  # (0 - disable cheats, 1 - enable cheats)
-      - CS2_PORT=27015                # (CS2 server listen port tcp_udp)
-      - CS2_SERVER_HIBERNATE=0        # (Put server in a low CPU state when there are no players. 0 - hibernation disabled, 1 - hibernation enabled)
-      - CS2_RCON_PORT                 # (Optional, use a simple TCP proxy to have RCON listen on an alternative port. Useful for services like AWS Fargate which do not support mixed protocol ports.)
-      - CS2_LAN=0                     # (0 - LAN mode disabled, 1 - LAN Mode enabled)
-      - CS2_RCONPW=$RCON_PASSWD       # (RCON password)
-      - CS2_PW=$SERVER_PASSWD         # (CS2 server password)
-      - CS2_MAXPLAYERS=12             # (Max players)
-      - CS2_ADDITIONAL_ARGS           # (Optional additional arguments to pass into cs2)
-      - CS2_CFG_URL                   # HTTP/HTTPS URL to fetch a Tar Gzip bundle of configuration files/mods
-      # Game modes
-      - CS2_GAMEALIAS                 # (Game type, e.g. casual, competitive, deathmatch. See https://developer.valvesoftware.com/wiki/Counter-Strike_2/Dedicated_Servers)
-      - CS2_GAMETYPE=0                # (Used if CS2_GAMEALIAS not defined. See https://developer.valvesoftware.com/wiki/Counter-Strike_2/Dedicated_Servers)
-      - CS2_GAMEMODE=1                # (Used if CS2_GAMEALIAS not defined. See https://developer.valvesoftware.com/wiki/Counter-Strike_2/Dedicated_Servers)
-      - CS2_MAPGROUP=mg_active        # (Map pool. Ignored if Workshop maps are defined.)
-      - CS2_STARTMAP=de_inferno       # (Start map. Ignored if Workshop maps are defined.)
-      # TV
-      - TV_AUTORECORD=0               # Automatically records all games as CSTV demos: 0=off, 1=on.
-      - TV_ENABLE=0                   # Activates CSTV on server: 0=off, 1=on.
-      - TV_PORT=27020                 # Host SourceTV port
-      - TV_PW=$CSTV_PASSWD                # CSTV password for clients
-      - TV_RELAY_PW=$CSTV_RELAY_PASSWD    # CSTV password for relay proxies
-      - TV_MAXRATE=0                  # World snapshots to broadcast per second. Affects camera tickrate.
-      - TV_DELAY=0                    # CSTV broadcast delay in seconds
-      # Logs
-      - CS2_LOG=on                    # 'on'/'off'
-      - CS2_LOG_MONEY=0               # Turns money logging on/off: (0=off, 1=on)
-      - CS2_LOG_DETAIL=0              # Combat damage logging: (0=disabled, 1=enemy, 2=friendly, 3=all)
-      - CS2_LOG_ITEMS=0               # Turns item logging on/off: (0=off, 1=on)
+  caddy:
+    image: lucaslorentz/caddy-docker-proxy:ci-alpine
+    container_name: caddy-reverse-proxy
+    restart: unless-stopped
+    env_file: .env
     volumes:
-      - ./cs2/steam:/home/steam/cs2-dedicated     # Persistent data volume mount point inside container
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
-      - "27015:27015/tcp"             # TCP
-      - "27015:27015/udp"             # UDP
-      - "27020:27020/udp"             # UDP
+      - 80:80
+      - 443:443
+
+  cs2:
+    image: joedwards32/cs2
+    container_name: cs2
+    restart: unless-stopped
+    env_file:
+      - .env
+      - ./env/cs2.env
+    volumes:
+      - ./cs2/steam:/home/steam/cs2-dedicated
+    ports:
+      - 27015:27015/tcp
+      - 27015:27015/udp
+      - 27020:27020/udp
     stdin_open: true
     tty: true
 
   propilkki2:
     build:
       context: ./propilkki2
+      args:
+        ORGA: "${ORGA}"
+        ADMIN: "${ADMIN}"
     container_name: propilkki2
     restart: unless-stopped
-    networks:
-      - caddy
+    env_file: .env
     ports:
-      - "4500:4500"
+      - 4500:4500
     labels:
       caddy: pilkki.$SERVER_HOSTNAME
       caddy.reverse_proxy: "{{upstreams 4500}}"
@@ -62,142 +45,61 @@ services:
     image: teamspeak
     container_name: teamspeak
     restart: unless-stopped
+    env_file:
+      - .env
+      - ./env/teamspeak.env
     ports:
       - 9987:9987/udp
-      - 10011:10011
-      - 30033:30033
-    environment:
-      TS3SERVER_DB_PLUGIN: ts3db_mariadb
-      TS3SERVER_DB_SQLCREATEPATH: create_mariadb
-      TS3SERVER_DB_HOST: $TS_MARIADB_HOST
-      TS3SERVER_DB_USER: $TS_MARIADB_USER
-      TS3SERVER_DB_PASSWORD: $TS_MARIADB_PASSWORD
-      TS3SERVER_DB_NAME: $TS_MARIADB_DATABASE
-      TS3SERVER_DB_WAITUNTILREADY: 30
-      TS3SERVER_LICENSE: accept
-
-  teamspeakdb:
-    image: mariadb
-    container_name: teamspeakdb
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: $TS_MARIADB_PASSWORD
-      MYSQL_DATABASE: $TS_MARIADB_DATABASE
-      MYSQL_USER: $TS_MARIADB_USER
-      MYSQL_PASSWORD: $TS_MARIADB_PASSWORD
-    volumes:
-      - teamspeakdb:/var/lib/mysql
 
   mumble:
     image: "mumblevoip/mumble-server:latest"
     container_name: mumble
-    user: ${UID}:${GID}
-    ports:
-      - "64738:64738/tcp"
-      - "64738:64738/udp"
-    volumes:
-      - ./mumble:/data
-    environment:
-      - MUMBLE_SERVER_PASSWORD=$ORGA
-      - MUMBLE_SUPERUSER_PASSWORD=$ORGA
-      - MUMBLE_BANDWIDTH=72000
-      - MUMBLE_REGISTER=false
-      - MUMBLE_CONFIG_WELCOMETEXT=$ORGA Mumble Server
     restart: unless-stopped
+    env_file:
+      - .env
+      - ./env/mumble.env
+    ports:
+      - 64738:64738
 
-  # GET5 Panel (CS2) services
-
-  redis:
-    image: redis:6
-    command: redis-server --requirepass $GET5_REDIS_PASSWORD
-    container_name: redis
-    networks:
-      - caddy
-    restart: always
-
-  get5db:
+  g5-db:
     image: yobasystems/alpine-mariadb
-    container_name: get5db
-    restart: always
-    networks:
-      - caddy
-    environment:
-      - MYSQL_ROOT_PASSWORD=$GET5_MARIADB_PASSWORD
-      - MYSQL_DATABASE=$GET5_MARIADB_DATABASE
-      - MYSQL_USER=$GET5_MARIADB_USER
-      - MYSQL_PASSWORD=$GET5_MARIADB_PASSWORD
-      - MYSQL_CHARSET=utf8mb4
-      - MYSQL_COLLATION=utf8mb4_general_ci
+    container_name: g5-db
+    restart: unless-stopped
+    env_file:
+      - .env
+      - ./env/get5.env
     volumes:
       - get5db:/var/lib/mysql
 
-  caddy:
-    image: lucaslorentz/caddy-docker-proxy:ci-alpine
-    container_name: caddy-reverse-proxy
-    restart: unless-stopped
-    networks:
-      - caddy
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - 80:80
-      - 443:443
-    environment:
-      - CADDY_INGRESS_NETWORKS=caddy
-
-  g5api:
+  g5-api:
     image: ghcr.io/phlexplexico/g5api:latest
     depends_on:
-      - get5db
-    container_name: G5API
-    networks:
-      - caddy
+      - g5-db
+    container_name: g5-api
+    restart: unless-stopped
+    env_file:
+      - .env
+      - ./env/get5.env
     labels:
       caddy: g5.$SERVER_HOSTNAME
       caddy.handle_path: /api/*
       caddy.handle_path.0_reverse_proxy: "{{upstreams 3301}}"
     volumes:
       - get5public:/Get5API/public
-    environment:
-      - NODE_ENV=production
-      - PORT=3301
-      - DBKEY=$GET5_DB_KEY
-      - STEAMAPIKEY=$GET5_STEAM_API_KEY
-      - HOSTNAME=https://g5.$SERVER_HOSTNAME
-      - SHAREDSECRET=$GET5_SECRET
-      - CLIENTHOME=https://g5.$SERVER_HOSTNAME
-      - APIURL=https://g5.$SERVER_HOSTNAME/api
-      - SQLUSER=$GET5_MARIADB_USER
-      - SQLPASSWORD=$GET5_MARIADB_PASSWORD
-      - SQLPORT=3306
-      - DATABASE=$GET5_MARIADB_DATABASE
-      - SQLHOST=get5db
-      - ADMINS=$GET5_ADMINS
-      - SUPERADMINS=$GET5_SUPERADMINS
-      - REDISURL=redis://:$GET5_REDIS_PASSWORD@redis:6379
-      - REDISTTL=86400
-      - USEREDIS=true
-      - UPLOADDEMOS=true
-      - LOCALLOGINS=false
-    restart: always
 
-  g5v:
+  g5-frontend:
     image: ghcr.io/phlexplexico/g5v:latest
     depends_on:
-      - g5api
-    container_name: G5V-frontend
-    networks:
-      - caddy
-    restart: always
+      - g5-api
+    container_name: g5-frontend
+    restart: unless-stopped
+    env_file:
+      - .env
+      - ./env/get5.env
     labels:
       caddy: g5.$SERVER_HOSTNAME
       caddy.reverse_proxy: "{{upstreams}}"
 
-networks:
-  caddy:
-    external: true
-
 volumes:
   get5db:
-  teamspeakdb:
   get5public:
