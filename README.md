@@ -5,7 +5,7 @@
 - x86 Unix environment (Linux, WSL or Mac)
 - Docker Compose
 
-## Installation
+## Installation and usage
 
 Try to make sure your user has uid=1000 and gid=1000.
 This is mostly required for CS2, as the container user has those IDs and needs read access to the bind mount.
@@ -17,92 +17,81 @@ Create `.env` files
 ./setup-env.sh
 ```
 
-Fill in Get5 admins and Steam API key in `.env`. Other configs are mostly interpolated with these variables, change them if needed.
-
-Optionally check if MetaMod, CounterStrikeSharp or MatchZy have been updated and create a pull request for the new versions.
-
-Start CS2 server once to download files:
-
-```
-docker compose up -d cs2
-```
-
-Monitor logs for CS2 installation progress
-
-```
-docker compose logs -f cs2
-```
-
-When completed, stop server(s)
-
-```
-docker compose down
-```
-
-Run CS2 setup script
-
-```
-docker compose -f install-cs2-plugins-docker-compose.yml up
-```
-
-After successful execution, servers should be ready for use.
-
-## Usage
+Start Mumble and Pro Pilkki 2
 
 ```
 docker compose up -d
 ```
 
-Usage is also possible with a convenience script `./up.sh`
-
-## Running another CS2 server
-
-Copy files from primary server
+### CS2 Regular
 
 ```
-./init-secondary-cs2.sh
+cd cs2
+./start-cs2.sh
 ```
 
-Start secondary server
+### CS2 Hunni (Max players 32)
 
 ```
-./start-secondary-cs2.sh
+cd cs2
+
+# Run init if running for the first time
+# If the regular has been started, this will copy the files
+# Otherwise it will download the server files again
+./init-hunni.sh
+
+./start-hunni.sh
 ```
 
-Server uses the same configs, but ports are 27016 for the game and 27021 for CSTV respectively.
+### CS2 MatchZy admins
 
-TODO: Investigate Caddy reverse proxy usage to set hostnames for CS2 servers
+Edit `cs2/admins.json` with a list of steamid64's. This gets automatically copied to the server and these users can change maps and other settings.
 
-## CS2 RCON
+https://shobhit-pathak.github.io/MatchZy/commands/
 
-Substitute hostname, RCON password and optionally port with correct values for environment
+### CS2 RCON
+
+MatchZy admins can run rcon commands from chat:
 
 ```
+# In CS2 chat
+.rcon mp_friendlyfire 1
+```
+
+Also possible with Docker:
+
+```
+# Substitute hostname, RCON password and optionally port with correct values for environment
 docker run -it --rm outdead/rcon ./rcon -a $SERVER_HOSTNAME:27015 -p $CS2_RCONPW "mp_friendlyfire 1"
 ```
 
-## TeamSpeak
-
-Check teamspeak container logs for ServerAdmin privilege key
-
-```
-docker compose logs teamspeak
-```
-
-TeamSpeak should ask for the privilege key when the first user connects, and that user will become the server admin.
-
-Configuration can then be done from the TeamSpeak client (e.g. right click server name -> Edit virtual server, Create channel etc.)
-
-
 ## Mumble
 
-Login as SuperUser with password from `env/mumble.env`.
+Login as SuperUser with password from `.env`.
 
 Configuration can then be done from the Mumble client (e.g. right click -> Add)
 
+By default, SuperUser cannot talk. If a user needs admin rights and wants to be able to talk, someone needs to connect as SuperUser and add that user to the `admin` group:
+
+1. Right click server root -> Edit
+2. Go to Groups tab
+3. Choose `admin` group
+4. Pick user or write username into field next to Add button under Members
+5. Click Add
+
 ## Pro Pilkki 2
 
-http://propilkki.net/index.php/pro-pilkki-2/verkkopelien-komennot
+https://propilkki.net/wp/verkkopelien-komennot/
+
+### Starting the map
+
+1. Connect to the server
+2. Obtain admin privileges by entering `/admin <adminpassword>` in chat
+3. Set map by picking the correct line from `propilkki2/autohost.ini` and pasting to chat
+4. Type `/wait 300` to start the map in 300 seconds. (A high value is preferred for a break between maps)
+5. After the map has finished, the wait time specified above will pass and the next map will start. Set the next map with instructions from step 3 before that happens.
+
+### Configuration
 
 Configuration is applied at Docker image build time.
 
@@ -114,44 +103,26 @@ docker compose up -d --build propilkki2
 
 By default only `$ORGA` and `$ADMIN` variables are passed to the build process.
 
-## Admin panels
-
-Pilkki admin should be accessible at `https://pilkki.<your hostname>`
-
-Get5 admin should be accessible at `https://g5.<your hostname>`
-
-**NOTE**: DNS needs to be configured for these urls to work. Point your hostname to the host ip. You can also use the ip to access admin panels.
-
 ## Troubleshooting
+
+### CSTV
+
+Might have delay. If so, send `.rcon tv_delay 0` to chat as MatchZy admin and hope for the best.
 
 ### CS2 error: Client is out of date
 
-Set `STEAMAPPVALIDATE=1` in `env/cs2.env`
-
-(Re)start CS2 server
+Redownload server files:
 
 ```
-docker compose restart cs2
+cd cs2
+
+# Either
+./repair-cs2.sh
+
+# or
+./repair-hunni.sh
 ```
 
-Monitor logs for CS2 validation progress
+### CS2 error: Client delta ticks out of order
 
-```
-docker compose logs -f cs2
-```
-
-When completed, stop server(s)
-
-```
-docker compose down cs2
-```
-
-Rerun CS2 setup script (`gameinfo.si` gets overwritten by validation)
-
-```
-./cs2.sh
-```
-
-Set `STEAMAPPVALIDATE=0` in `env/cs2.env`
-
-Run server normally ([Usage](#usage))
+Happens with CSTV. No idea why. Spectate normally.

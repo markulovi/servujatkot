@@ -1,31 +1,4 @@
 services:
-  caddy:
-    image: lucaslorentz/caddy-docker-proxy:ci-alpine
-    container_name: caddy-reverse-proxy
-    restart: unless-stopped
-    env_file: .env
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - 80:80
-      - 443:443
-
-  cs2:
-    image: joedwards32/cs2
-    container_name: cs2
-    restart: unless-stopped
-    env_file:
-      - .env
-      - ./env/cs2.env
-    volumes:
-      - ./cs2/steam:/home/steam/cs2-dedicated
-    ports:
-      - 27015:27015/tcp
-      - 27015:27015/udp
-      - 27020:27020/udp
-    stdin_open: true
-    tty: true
-
   propilkki2:
     build:
       context: ./propilkki2
@@ -37,69 +10,11 @@ services:
     env_file: .env
     ports:
       - 4500:4500
-    labels:
-      caddy: pilkki.$SERVER_HOSTNAME
-      caddy.reverse_proxy: "{{upstreams 4500}}"
-
-  teamspeak:
-    image: teamspeak
-    container_name: teamspeak
-    restart: unless-stopped
-    env_file:
-      - .env
-      - ./env/teamspeak.env
-    ports:
-      - 9987:9987/udp
-
   mumble:
     image: "mumblevoip/mumble-server:latest"
     container_name: mumble
     restart: unless-stopped
-    env_file:
-      - .env
-      - ./env/mumble.env
+    env_file: .env
     ports:
       - 64738:64738
 
-  g5-db:
-    image: yobasystems/alpine-mariadb
-    container_name: g5-db
-    restart: unless-stopped
-    env_file:
-      - .env
-      - ./env/get5.env
-    volumes:
-      - get5db:/var/lib/mysql
-
-  g5-api:
-    image: ghcr.io/phlexplexico/g5api:latest
-    depends_on:
-      - g5-db
-    container_name: g5-api
-    restart: unless-stopped
-    env_file:
-      - .env
-      - ./env/get5.env
-    labels:
-      caddy: g5.$SERVER_HOSTNAME
-      caddy.handle_path: /api/*
-      caddy.handle_path.0_reverse_proxy: "{{upstreams 3301}}"
-    volumes:
-      - get5public:/Get5API/public
-
-  g5-frontend:
-    image: ghcr.io/phlexplexico/g5v:latest
-    depends_on:
-      - g5-api
-    container_name: g5-frontend
-    restart: unless-stopped
-    env_file:
-      - .env
-      - ./env/get5.env
-    labels:
-      caddy: g5.$SERVER_HOSTNAME
-      caddy.reverse_proxy: "{{upstreams}}"
-
-volumes:
-  get5db:
-  get5public:
