@@ -1,0 +1,37 @@
+services:
+  cs2:
+    image: joedwards32/cs2
+    container_name: cs2
+    restart: unless-stopped
+    env_file:
+      - ../.env
+      - ./cs2.env
+    volumes:
+      - ./data:/home/steam/cs2-dedicated
+      - ./pre.sh:/home/steam/cs2-dedicated/pre.sh
+      - ./admins.json:/home/steam/cs2-dedicated/admins.json
+    ports:
+      - 27015:27015/tcp
+      - 27015:27015/udp
+      - 27020:27020/udp
+    stdin_open: true
+    tty: true
+  hunni:
+    image: joedwards32/cs2
+    container_name: hunni
+    restart: unless-stopped
+    env_file:
+      - ../.env
+      - ./cs2.env
+    volumes:
+      - ./hunni:/home/steam/cs2-dedicated
+      - ./pre.sh:/home/steam/cs2-dedicated/pre.sh
+      - ./admins.json:/home/steam/admins.json
+      - ./gamemodes_server.txt:/home/steam/gamemodes_server.txt
+    ports:
+      - 27015:27015/tcp
+      - 27015:27015/udp
+      - 27020:27020/udp
+    stdin_open: true
+    tty: true
+

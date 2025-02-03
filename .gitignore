@@ -1,3 +1,4 @@
-cs2
-cs2-secondary
+cs2/data
+cs2/hunni
 *.env
+
