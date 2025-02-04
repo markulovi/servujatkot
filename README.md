@@ -100,7 +100,7 @@ Edit `propilkki/pp2host.conf` and `propilkki/autohost.ini` and force rebuild
 docker compose up -d --build propilkki2
 ```
 
-By default only `$ORGA` and `$ADMIN` variables are passed to the build process.
+By default only `$ORGA`, `$ADMIN` and `$PILKKI_PW` variables are passed to the build process.
 
 ## Troubleshooting
 

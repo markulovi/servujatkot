@@ -5,6 +5,7 @@ services:
       args:
         ORGA: "${ORGA}"
         ADMIN: "${ADMIN}"
+        PILKKI_PW: "${PILKKI_PW}"
     container_name: propilkki2
     restart: unless-stopped
     env_file: .env
