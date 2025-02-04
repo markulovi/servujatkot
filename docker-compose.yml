@@ -22,4 +22,3 @@ services:
       - 64738:64738
 volumes:
   mumble:
-
