@@ -16,6 +16,10 @@ services:
     container_name: mumble
     restart: unless-stopped
     env_file: .env
+    volumes:
+      - mumble:/data
     ports:
       - 64738:64738
+volumes:
+  mumble:
 
