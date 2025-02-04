@@ -11,13 +11,9 @@ Try to make sure your user has uid=1000 and gid=1000.
 This is mostly required for CS2, as the container user has those IDs and needs read access to the bind mount.
 Check with `id`.
 
-Create `.env` files
+CS2 is assumed to be ran with only one server at a time. The scripts will stop possible other servers before starting.
 
-```
-./setup-env.sh
-```
-
-Start Mumble and Pro Pilkki 2
+### Mumble and Pro Pilkki 2
 
 ```
 docker compose up -d
@@ -25,36 +21,39 @@ docker compose up -d
 
 ### CS2 Regular
 
+Start server, plugins and configuration are automatic:
+
 ```
 cd cs2
 ./start-cs2.sh
+
+# Stop server after match
+./stop.sh
 ```
 
 ### CS2 Hunni (Max players 32)
 
 ```
 cd cs2
-
-# Run init if running for the first time
-# If the regular has been started, this will copy the files
-# Otherwise it will download the server files again
-./init-hunni.sh
-
 ./start-hunni.sh
+
+# Stop server after match
+./stop.sh
 ```
 
-### CS2 MatchZy admins
+### CS2 MatchZy commands
 
-Edit `cs2/admins.json` with a list of steamid64's. This gets automatically copied to the server and these users can change maps and other settings.
+Everyone is an admin. Commands below can be used to set up maps and matches.
+
+Remember to set team names with `.team1 Team1Name` and `.team2 Team2Name`
 
 https://shobhit-pathak.github.io/MatchZy/commands/
 
 ### CS2 RCON
 
-MatchZy admins can run rcon commands from chat:
+RCON is available in CS2 chat:
 
 ```
-# In CS2 chat
 .rcon mp_friendlyfire 1
 ```
 
@@ -69,7 +68,7 @@ docker run -it --rm outdead/rcon ./rcon -a $SERVER_HOSTNAME:27015 -p $CS2_RCONPW
 
 Login as SuperUser with password from `.env`.
 
-Configuration can then be done from the Mumble client (e.g. right click -> Add)
+Configuration can then be done from the Mumble client.
 
 By default, SuperUser cannot talk. If a user needs admin rights and wants to be able to talk, someone needs to connect as SuperUser and add that user to the `admin` group:
 
@@ -104,6 +103,14 @@ docker compose up -d --build propilkki2
 By default only `$ORGA` and `$ADMIN` variables are passed to the build process.
 
 ## Troubleshooting
+
+CS2 logs:
+
+```
+cd cs2
+docker compose logs -f
+```
+
 
 ### CSTV
 

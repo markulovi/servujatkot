@@ -5,11 +5,11 @@ services:
     restart: unless-stopped
     env_file:
       - ../.env
-      - ./cs2.env
+    environment:
+      - STEAMAPPVALIDATE=${STEAMAPPVALIDATE:-0}
     volumes:
       - ./data:/home/steam/cs2-dedicated
       - ./pre.sh:/home/steam/cs2-dedicated/pre.sh
-      - ./admins.json:/home/steam/cs2-dedicated/admins.json
     ports:
       - 27015:27015/tcp
       - 27015:27015/udp
@@ -22,11 +22,11 @@ services:
     restart: unless-stopped
     env_file:
       - ../.env
-      - ./cs2.env
+    environment:
+      - STEAMAPPVALIDATE=${STEAMAPPVALIDATE:-0}
     volumes:
-      - ./hunni:/home/steam/cs2-dedicated
+      - ./data:/home/steam/cs2-dedicated
       - ./pre.sh:/home/steam/cs2-dedicated/pre.sh
-      - ./admins.json:/home/steam/admins.json
       - ./gamemodes_server.txt:/home/steam/gamemodes_server.txt
     ports:
       - 27015:27015/tcp

@@ -1,2 +1,4 @@
-docker compose run -e STEAMAPPVALIDATE=1 -d hunni
+mkdir -p data
+docker compose down
+STEAMAPPVALIDATE=1 docker compose up -d hunni
 
