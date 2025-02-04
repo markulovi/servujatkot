@@ -23,7 +23,7 @@ Start server, plugins and configuration are automatic:
 
 ```
 cd cs2
-./start-cs2.sh
+./start.sh
 
 # Stop server after match
 ./stop.sh
@@ -112,7 +112,7 @@ Redownload server files:
 cd cs2
 
 # Starts server after repair
-./repair-cs2.sh
+./repair.sh
 
 # Stop server after match
 ./stop.sh
