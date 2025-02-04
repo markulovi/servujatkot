@@ -24,6 +24,7 @@ fi
 sed -i 's/matchzy_minimum_ready_required.*/matchzy_minimum_ready_required 10/' ./cfg/MatchZy/config.cfg
 sed -i 's/matchzy_everyone_is_admin.*/matchzy_everyone_is_admin true/' ./cfg/MatchZy/config.cfg
 
+rm -f ./gamemodes_server.txt
 if [ -f /home/steam/gamemodes_server.txt ]; then
   cp /home/steam/gamemodes_server.txt ./gamemodes_server.txt
 fi
