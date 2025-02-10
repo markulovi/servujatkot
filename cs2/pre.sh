@@ -21,12 +21,10 @@ if ! grep -q "csgo/addons/metamod" ./gameinfo.gi; then
   sed -i 's/^\(\t\t\tGame\tcsgo\)\([^_]\)/\1\/addons\/metamod\r\n\t\t\tGame\tcsgo\2/' ./gameinfo.gi
 fi
 
-mkdir -p ./cfg/MatchZy
-cp /home/steam/admins.json ./cfg/MatchZy/admins.json
+sed -i 's/matchzy_minimum_ready_required.*/matchzy_minimum_ready_required 10/' ./cfg/MatchZy/config.cfg
+sed -i 's/matchzy_everyone_is_admin.*/matchzy_everyone_is_admin true/' ./cfg/MatchZy/config.cfg
 
-if [ -f /home/steam/gamemodes_server.txt ]; then
-  cp /home/steam/gamemodes_server.txt ./gamemodes_server.txt
-fi
+cp /home/steam/gamemodes_server.txt ./gamemodes_server.txt
 
 popd
 

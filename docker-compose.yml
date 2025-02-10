@@ -5,6 +5,7 @@ services:
       args:
         ORGA: "${ORGA}"
         ADMIN: "${ADMIN}"
+        PILKKI_PW: "${PILKKI_PW}"
     container_name: propilkki2
     restart: unless-stopped
     env_file: .env
@@ -15,6 +16,9 @@ services:
     container_name: mumble
     restart: unless-stopped
     env_file: .env
+    volumes:
+      - mumble:/data
     ports:
       - 64738:64738
-
+volumes:
+  mumble:

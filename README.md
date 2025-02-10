@@ -5,71 +5,58 @@
 - x86 Unix environment (Linux, WSL or Mac)
 - Docker Compose
 
-## Installation and usage
+## Usage
 
 Try to make sure your user has uid=1000 and gid=1000.
-This is mostly required for CS2, as the container user has those IDs and needs read access to the bind mount.
+This is required for CS2, as the container user has those IDs and needs read access to the bind mount.
 Check with `id`.
 
-Create `.env` files
-
-```
-./setup-env.sh
-```
-
-Start Mumble and Pro Pilkki 2
+### Mumble and Pro Pilkki 2
 
 ```
 docker compose up -d
 ```
 
-### CS2 Regular
+### CS2
+
+Start server, plugins and configuration are automatic:
 
 ```
 cd cs2
-./start-cs2.sh
+./start.sh
+
+# Stop server after match
+./stop.sh
 ```
 
-### CS2 Hunni (Max players 32)
+### CS2 MatchZy commands
 
-```
-cd cs2
+Everyone is an admin. Commands below can be used to set up maps and matches.
 
-# Run init if running for the first time
-# If the regular has been started, this will copy the files
-# Otherwise it will download the server files again
-./init-hunni.sh
-
-./start-hunni.sh
-```
-
-### CS2 MatchZy admins
-
-Edit `cs2/admins.json` with a list of steamid64's. This gets automatically copied to the server and these users can change maps and other settings.
+Remember to set team names with `.team1 Team1Name` and `.team2 Team2Name`.
 
 https://shobhit-pathak.github.io/MatchZy/commands/
 
 ### CS2 RCON
 
-MatchZy admins can run rcon commands from chat:
+RCON is available in CS2 chat:
 
 ```
-# In CS2 chat
 .rcon mp_friendlyfire 1
 ```
 
 Also possible with Docker:
 
 ```
-# Substitute hostname, RCON password and optionally port with correct values for environment
-docker run -it --rm outdead/rcon ./rcon -a $SERVER_HOSTNAME:27015 -p $CS2_RCONPW "mp_friendlyfire 1"
+# Substitute hostname and RCON password with correct values for environment
+docker run -it --rm outdead/rcon ./rcon -a localhost:27015 -p $CS2_RCONPW "mp_friendlyfire 1"
 ```
 
 ## Mumble
 
 Login as SuperUser with password from `.env`.
 
-Configuration can then be done from the Mumble client (e.g. right click -> Add)
+Configuration can then be done from the Mumble client.
 
 By default, SuperUser cannot talk. If a user needs admin rights and wants to be able to talk, someone needs to connect as SuperUser and add that user to the `admin` group:
 
@@ -95,15 +82,23 @@ https://propilkki.net/wp/verkkopelien-komennot/
 
 Configuration is applied at Docker image build time.
 
-Edit `propilkki/pp2host.conf` and `propilkki/autohost.ini` and force rebuild
+Edit `propilkki/pp2host.conf` and `propilkki/autohost.ini` and force rebuild:
 
 ```
 docker compose up -d --build propilkki2
 ```
 
-By default only `$ORGA` and `$ADMIN` variables are passed to the build process.
+By default only `$ORGA`, `$ADMIN` and `$PILKKI_PW` variables are passed to the build process.
 
 ## Troubleshooting
+
+### CS2 logs:
+
+```
+cd cs2
+
+docker compose logs -f
+```
 
 ### CSTV
 
@@ -116,11 +111,11 @@ Redownload server files:
 ```
 cd cs2
 
-# Either
-./repair-cs2.sh
+# Starts server after repair
+./repair.sh
 
-# or
-./repair-hunni.sh
+# Stop server after match
+./stop.sh
 ```
 
 ### CS2 error: Client delta ticks out of order
