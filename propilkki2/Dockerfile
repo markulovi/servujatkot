@@ -1,8 +1,8 @@
 FROM ubuntu:latest
 RUN apt-get update
-RUN apt-get install -y wget nano gnupg
+RUN apt-get install -y wget nano gnupg apt-utils
 RUN wget -O - http://procyon.ddns.net:8080/propilkki_pub.gpg.key | apt-key add -
-RUN echo "deb http://procyon.ddns.net:8080/repos/apt/ubuntu focal main" | tee -a /etc/apt/sources.list
+RUN echo "deb http://procyon.ddns.net:8080/repos/apt/ubuntu noble main" | tee -a /etc/apt/sources.list
 RUN apt-get update
 RUN apt-get install pp2host
 COPY autohost.ini /etc/pp2host/static/autohost.ini
